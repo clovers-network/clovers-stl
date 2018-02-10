@@ -10,7 +10,7 @@ var winner = __WINNER__
 
 function main() {
 
-var fn = 12
+var fn = 48
 
 let grid = []
 board.forEach((r, i) => {
