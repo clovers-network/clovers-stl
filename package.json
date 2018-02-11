@@ -1,15 +1,12 @@
 {
-  "name": "clover-stl",
-  "version": "1.0.0",
+  "name": "clovers-stl",
+  "version": "0.0.1",
   "description": "using OJSCAD CLI to make clovers",
   "main": "index.js",
   "bin": {
     "clovers-stl": "bin/clovers-stl.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Billy Rennekamp",
+  "author": "Billy Rennekamp &lt;hello@okw.me&gt;",
   "license": "ISC",
   "dependencies": {
     "@jscad/openjscad": "^1.6.1",
@@ -18,5 +15,11 @@
     "commander": "^2.14.1",
     "fs": "0.0.1-security",
     "shelljs": "^0.8.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/okwme/clovers-stl.git"
+  },
+  "scripts": {}
 }
