@@ -1,4 +1,4 @@
-// title      : Clovers Sample
+module.exports = `// title      : Clovers Sample
 // author     : Billy Rennekamp
 // license    : MIT License
 // revision   : 0.003
@@ -61,4 +61,4 @@ return union(
   ...grid
   )
  ).translate([0,0,1]).scale(5);
-}
+}`
