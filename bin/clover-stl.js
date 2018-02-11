@@ -7,6 +7,8 @@ var Reversi = require('../lib/reversi.js')
 
 commander
     .version('0.0.1')
+    .option('-x, --complexity [complexity]', 'mesh complexity (default 12)')
+
 
 commander
 .command('* <moves>')
@@ -17,86 +19,68 @@ commander
     reversi.playGameMovesString(moves)
     reversi.isSymmetrical()
 
+    let symmetrical = reversi.symmetrical ? 'S' : 'N'
+
     reversi.makeVisualBoard().map((r) => {
       console.log(r.join(' '))
     })
-    console.log('\n\n')
-    console.log(colors.yellow('⚙  Building jscad...'))
-    console.log(colors.yellow('☑️  Completed jscad'))
+    // console.log('\n\n')
     if (fs.existsSync('./assets/template.jscad')) {
-
       try {
-        await new Promise((resolve, reject) => {
-          fs.readFile('./assets/template.jscad', 'utf8', function(err, template) {
+        await new Promise(async (resolve, reject) => {
+          fs.readFile('./assets/template.jscad', 'utf8', async (err, template) => {
             if (err) {
               reject(err)
             } else {
-              let printed = '[' + reversi.rowBoard.map((r) => {
-                return '\n  ['+ r.join(',') + ']'
-              }).join(',') + '\n]'
-
+              let printed = '[' + reversi.rowBoard.map((r) => '\n  ['+ r.join(',') + ']').join(',') + '\n]'
               template = template.replace(new RegExp('__BOARD__', 'g'), printed)
+
+              let fn = commander.complexity || 12
+              template = template.replace(new RegExp('__FN__', 'g'), fn)
               
-              let winner = reversi.whiteScore === reversi.blackScore ? reversi.EMPTY : (reversi.whiteScore > reversi.blackScore ? reversi.BLACK : reversi.WHITE)
-              // console.log(colors.gray('white has ' + reversi.whiteScore))
-              // console.log(colors.gray('black has ' + reversi.blackScore))
-              // console.log(colors.gray('winner is ' + winner))
+              let winner = reversi.whiteScore === reversi.blackScore ? reversi.EMPTY : (reversi.whiteScore > reversi.blackScore ? reversi.WHITE : reversi.BLACK)
+              let winner_ = winner === reversi.WHITE ? 'W' : (winner === reversi.BLACK ? 'B' : 'TIE')
+              
+              console.log(colors.gray('W (' + reversi.WHITE + '): ' + reversi.whiteScore))
+              console.log(colors.gray('B (' + reversi.BLACK + '): ' + reversi.blackScore))
+              console.log(colors.gray('Winner: ' + winner_))
+              console.log(colors.gray('Symmetrical: ' + (reversi.symmetrical ? 'true' : 'false')))
+              console.log(colors.gray('Board: ' + reversi.byteBoard))
+
+              var generate = function (winner, winner_) {
+                return new Promise((resolve, reject) => {
+                  try {
+                    let file = template.replace(new RegExp('__WINNER__', 'g'), winner)
+                    let filename = './assets/jscad/' + fn + '-' + winner_ + '-' + symmetrical + '-' + reversi.byteBoard + '-' + moves + '.jscad'
+                    console.log(colors.yellow('⚙  Building jscad ' + winner_))
+                    fs.writeFile(filename, file, function (err, resp) {
+                      if (err) {
+                        reject(err)
+                      } else {
+                        console.log(colors.green('☑️  Completed jscad ' + winner_ + ' ' + filename))
+                        let stlFilename = filename.replace(new RegExp('jscad', 'g'), 'stl')
+                        console.log(colors.yellow('⚙  Building STL ' + winner_))
+                        shell.exec('openjscad ' + filename + ' -of stlb -o ' + stlFilename, {silent: true})
+                        console.log(colors.green('☑️  Completed STL ' + winner_ + ' ' + stlFilename))
+                        resolve()
+                      }
+                    })
+                  } catch (error) {
+                    reject(error)
+                  }
+                })
+              }
+
               if (winner === reversi.EMPTY) {
-                let file1 = template.replace(new RegExp('__WINNER__', 'g'), reversi.WHITE)
-                let done1 = false
-                let file1name = './assets/jscad/W-' + moves + '.jscad'
-                fs.writeFile(file1name, file1, function (err, resp) {
-                  if (err) {
-                    reject(err)
-                  } else {
-                    let stlFile1name = file1name.replace(new RegExp('jscad', 'g'), 'stl')
-                    console.log(colors.yellow('⚙  Building STL 1/2...'))
-                    shell.exec('openjscad ' + file1name + ' -of stlb -o ' + stlFile1name, {silent: true})
-                    console.log(colors.yellow('☑️  Completed STL'))
-                    if (done2) {
-                      resolve()
-                    } else {
-                      done1 = true
-                    }
-                  }
-                })
-                let done2 = false
-                let file2 = template.replace(new RegExp('__WINNER__', 'g'), reversi.BLACK)
-                let file2name = './assets/jscad/B-' + moves + '.jscad'
-                fs.writeFile(file2name, file2, function (err, resp) {
-                  if (err) {
-                    reject(err)
-                  } else {
-                    let stlFile2name = file2name.replace(new RegExp('jscad', 'g'), 'stl')
-                    console.log(colors.yellow('⚙  Building STL 2/2...'))
-                    shell.exec('openjscad ' + file2name + ' -of stlb -o ' + stlFile2name, {silent: true})
-                    console.log(colors.yellow('☑️  Completed STL'))
-                    if (done1) {
-                      resolve()
-                    } else {
-                      done2 = true
-                    }
-                  }
-                })
+                await generate(reversi.BLACK, 'B')
+                await generate(reversi.WHITE, 'W')
               } else {
-                let file = template.replace(new RegExp('__WINNER__', 'g'), winner)
-                let filename = './assets/jscad/' + (winner === reversi.WHITE ? 'W-' : 'B-') + moves + '.jscad'
-                fs.writeFile(filename, file, function (err, resp) {
-                  if (err) {
-                    reject(err)
-                  } else {
-                    let stlFilename = filename.replace(new RegExp('jscad', 'g'), 'stl')
-                    console.log(colors.yellow('⚙  Building STL...'))
-                    shell.exec('openjscad ' + filename + ' -of stlb -o ' + stlFilename, {silent: true})
-                    console.log(colors.yellow('☑️  Completed STL'))
-                    resolve()
-                  }
-                })
+                await generate(winner, winner_)
               }
             }
           })
         })
-        console.log(colors.green('🎉  All Done'))
+        console.log(colors.grey('🎉  All Done 🎉'))
       } catch (error) {
         console.log(error)
       }
