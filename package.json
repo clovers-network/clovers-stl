@@ -1,6 +1,6 @@
 {
   "name": "clovers-stl",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "using OJSCAD CLI to make clovers",
   "main": "index.js",
   "bin": {
