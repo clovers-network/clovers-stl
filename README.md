@@ -1,4 +1,10 @@
 # Clovers CLI for generating STL and JSCAD from moves
+
+## install
+`npm install -g clovers-stl`
+
+## run
+
 ```
 
   Usage: clovers-stl [options] [command]
