@@ -4,7 +4,7 @@
   "description": "using OJSCAD CLI to make clovers",
   "main": "index.js",
   "bin": {
-    "clover-stl": "bin/clovers-stl.js"
+    "clovers-stl": "bin/clovers-stl.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
