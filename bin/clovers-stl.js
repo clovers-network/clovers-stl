@@ -8,7 +8,8 @@ var template = require('../assets/template.js')
 
 commander
     .version('0.0.1')
-    .option('-x, --complexity [complexity]', 'mesh complexity (default 12)')
+    .option('-x, --complexity [complexity]', 'mesh complexity (int - default 12)')
+    .option('-t, --thick [thick]', 'thick version (bool - default false)')
 
 commander
 .command('* <moves>')
@@ -31,6 +32,9 @@ commander
     let fn = commander.complexity || 12
     template = template.replace(new RegExp('__FN__', 'g'), fn)
     
+    let thick = commander.thick || false
+    template = template.replace(new RegExp('__FAT__', 'g'), thick)
+    
     let winner = reversi.whiteScore === reversi.blackScore ? reversi.EMPTY : (reversi.whiteScore > reversi.blackScore ? reversi.WHITE : reversi.BLACK)
     let winner_ = winner === reversi.WHITE ? 'W' : (winner === reversi.BLACK ? 'B' : 'TIE')
     
@@ -49,7 +53,7 @@ commander
           if (!fs.existsSync(path)) fs.mkdirSync(path)
 
           let file = template.replace(new RegExp('__WINNER__', 'g'), winner)
-          let filename = path + fn + '-' + winner_ + '-' + symmetrical + '-' + reversi.byteBoard + '-' + moves + '.jscad'
+          let filename = path + fn + (thick ? '-thick' : '') + '-' + winner_ + '-' + symmetrical + '-' + reversi.byteBoard + '-' + moves + '.jscad'
           console.log(colors.yellow('⚙  Building jscad ' + winner_))
           fs.writeFile(filename, file, function (err, resp) {
             if (err) {

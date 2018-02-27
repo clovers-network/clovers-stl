@@ -11,6 +11,7 @@ var winner = __WINNER__
 function main() {
 
 var fn = __FN__
+var fat = __FAT__
 
 let grid = []
 board.forEach((r, i) => {
@@ -21,12 +22,12 @@ board.forEach((r, i) => {
     if (t === 3) {
       grid.push(
         sphere({r:0.81, fn: fn, center: true})
-        .translate([ii,jj, 1.4])
+        .translate([ii,jj, fat ? 2.45 : 1.425])
         .scale([1,1,0.5])
       )            
       grid.push(
         sphere({r:0.81, fn: fn, center: true})
-        .translate([ii,jj, -1.4])
+        .translate([ii,jj, fat ? -2.45 : -1.425])
         .scale([1,1,0.5])
       )
     } else {
@@ -38,7 +39,7 @@ board.forEach((r, i) => {
             translate(
               [ 1.05, 0 ,0],
               circle({r: .1, fn: fn, center: true})
-              .scale([6, 6 ,1])
+              .scale([6, fat ? 12 : 6 ,1])
             )
           ).translate([ii,jj])
         )
@@ -50,10 +51,10 @@ board.forEach((r, i) => {
 return union(
  difference(
   union(
-    rotate_extrude({fn: fn * 2}, translate([8,0,0],circle({r: 0.5, fn: fn, center: true}))),
+    rotate_extrude({fn: fn * 2}, translate([8,0,0],circle({r: fat ? 1 : 0.5, fn: fn, center: true}))),
     cylinder({
       r: 8,
-      h: 1,
+      h: fat ? 2 : 1,
       center: true, 
       fn: fn * 2, 
     })
